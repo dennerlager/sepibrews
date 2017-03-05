@@ -28,6 +28,9 @@ class Cn7800():
         temperature = round(temperature, 1) * 10
         self.writeRegister('set_point', temperature)
 
+    def getSetValue(self):
+        return self.readRegister('set_point') / 10
+
     def start(self):
         self.writeBit('control_run_stop', True)
 
@@ -54,6 +57,10 @@ class Cn7800test(unittest.TestCase):
     def test_setTemperature(self):
         self.tc.setTemperature(12.46)
         self.assertEqual(self.tc.readRegister('set_point'), 125)
+
+    def test_getSetValue(self):
+        self.tc.setTemperature(12)
+        self.assertEqual(self.tc.getSetValue(), 12)
 
     def test_readBit(self):
         self.assertEqual(self.tc.readBit('communication_enabled'), True)

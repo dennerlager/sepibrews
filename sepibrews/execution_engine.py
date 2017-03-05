@@ -5,6 +5,7 @@ import progressbar
 import time
 import sys
 from multiprocessing import Process, Queue
+from serial.serialutil import SerialException
 from Queue import Empty
 from cn7800 import Cn7800
 from cn7800mock import Cn7800Mock
@@ -13,35 +14,42 @@ from parser import Parser
 sys.path.append('./recipes/')
 
 class ExecutionEngine(Process):
-    def __init__(self, slaveAddress, inq, outq):
+    def __init__(self, slaveAddress, inq, outq, recipe):
         Process.__init__(self)        
         self.inq = inq
         self.outq = outq
+        self.recipe = RecipeBuilder().parse(recipe)                
         self.parser = Parser(self)
-        self.tempController = Cn7800(slaveAddress)
+        try:
+            self.tempController = Cn7800(slaveAddress)
+        except SerialException:
+            print('interface not found, using mock')
+            self.tempController = Cn7800Mock(slaveAddress)
 
     def __del__(self):
         self.tempController.stop()
 
-    def start(self):
-        self.handleCommunication()
+    def run(self):
+        while True:
+            self.handleCommunication()
 
     def handleCommunication(self):
         try:
-            commandstring = self.inq.get(block=True, timeout=0.5)
+            commandname = self.inq.get(block=True, timeout=0.5)
         except Empty:
             return
-        command = self.parser.parse(commandstring)
+        command = self.parser.parse(commandname)
         self.outq.put(command.execute())
-
-    def setRecipe(self, recipe):
-        self.recipe = RecipeBuilder().parse(recipe)        
 
     def execute(self):
         self.tempController.start()
         for step in self.recipe:
             self.waitTillTempReached(step.temperatureC)
             self.holdTemperatureFor(step.durationMin)
+        self.stopExecution()
+
+    def stopExecution(self):
+        self.tempController.setTemperature(0)
         self.tempController.stop()
 
     def waitTillTempReached(self, temperatureC):
@@ -65,10 +73,15 @@ class ExecutionEngine(Process):
                 self.handleCommunication()
                 bar.update(min((time.time() - startTime, durationSec)))
 
+    def getSetValue(self):
+        return self.tempController.getSetValue()
+
+    def getTemperature(self):
+        return self.tempController.getTemperature()
+
 if __name__ == '__main__':
     qToEe = Queue()
     qFromEe = Queue()
-    ee = ExecutionEngine(1, qToEe, qFromEe)
-    ee.setRecipe('./recipes/test.csv')
-    ee.tempController = Cn7800Mock(1)
+    from cn7800mock import Cn7800Mock as Cn7800    
+    ee = ExecutionEngine(1, qToEe, qFromEe, './recipes/test.csv')
     ee.execute()

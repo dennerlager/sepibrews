@@ -1,153 +1,78 @@
 #!/usr/bin/env python
 from __future__ import print_function, division
 import unittest
+import sys
 
 class Command():
-    """Use factory method 'create(command_name, ...)' to instantiate"""
+    """Use factory method 'create(command_name)' to instantiate"""
 
     @staticmethod
-    def create(command_name, address=0x00, data=0x00):
-        if command_name == 'nop':
-            return NopCommand(address, data)
-        elif command_name == 'page_sel':
-            return PageSelCommand(address, data)
-        elif command_name == 'read':
-            return ReadCommand(address, data)
-        elif command_name == 'write':
-            return WriteCommand(address, data)
-        elif command_name == 'quit':
-            return QuitCommand(address, data)
-        elif command_name == 'reset':
-            return ResetCommand(address, data)
-        elif command_name == 'row_read':
-            return RowReadCommand(address, data)
-        elif command_name == 'convert':
-            return ConvertCommand(address, data)
-        elif command_name == 'exposure':
-            return ExposureCommand(address, data)
+    def create(command_name, executionEngine):
+        if command_name == 'start':
+            return StartCommand(executionEngine)
+        elif command_name == 'stop':
+            return StopCommand(executionEngine)
+        elif command_name == 'getPv':
+            return GetPvCommand(executionEngine)
+        elif command_name == 'getSv':
+            return GetSvCommand(executionEngine)
+        elif command_name == 'getStepTime':
+            return GetStepTimeCommand(executionEngine)
+        elif command_name == 'getTotalTime':
+            return GetTotalTimeCommand(executionEngine)
         else:
-            raise ValueError("there's no command {}".format(command_name))
+            raise ValueError("no such command: {}".format(command_name))
 
-    def __init__(self, address, data):
-        if not 0 <= address <= 0x1f:
-            raise ValueError('address {} out of range'.format(address))
-        self.address = address
-        if not 0 <= data <= 255:
-            raise ValueError('data {} out of range'.format(data))
-        self.data = data    
+    def __init__(self, executionEngine):
+        self.executionEngine = executionEngine
 
-    def get_bytelist(self):
-        return [(self.cid << 5) | self.address, self.data][:]
+    def execute(self):
+        raise NotImplementedError()
 
-    def __str__(self):
-        return ('command name: {}, address: 0x{:0>2x}, data: 0x{:0>2x}'
-                .format(self.name, self.address, self.data))
+class StartCommand(Command):
+    def execute(self):
+        self.executionEngine.execute()
 
-class NopCommand(Command):
-    cid = 0
-    name = 'nop'
+class StopCommand(Command):
+    def execute(self):
+        self.executionEngine.stopExecution()
+        sys.exit()
 
-class PageSelCommand(Command):
-    cid = 0
-    name = 'page_sel'
-    def __init__(self, address, data):
-        Command.__init__(self, address, data)
-        if not self.address <= 4:
-            raise ValueError('page {} out of range'.format(self.address))
+class GetPvCommand(Command):
+    def execute(self):
+        return self.executionEngine.getTemperature()
 
-    def get_bytelist(self):
-        return [(self.cid << 5) | (self.address | 0x10), self.data]
+class GetSvCommand(Command):
+    def execute(self):
+        return self.executionEngine.getSetValue()
 
-class ReadCommand(Command):
-    cid = 1
-    name = 'read'
+class GetStepTimeCommand(Command):
+    pass        
 
-class WriteCommand(Command):
-    cid = 2
-    name = 'write'
+class GetTotalTimeCommand(Command):
+    pass        
 
-class QuitCommand(Command):
-    cid = 3
-    name = 'quit'
-
-class ResetCommand(Command):
-    cid = 4
-    name = 'reset'
-
-class RowReadCommand(Command):
-    cid = 5
-    name = 'row_read'
-
-class ConvertCommand(Command):
-    cid = 6
-    name = 'convert'
-
-class ExposureCommand(Command):
-    cid = 7
-    name = 'exposure'
-
-class Command_test(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
+class CommandCreationTest(unittest.TestCase):
     def test_instantiate_raises(self):
-        self.assertRaises(ValueError, Command.create, 'asdf')
+        self.assertRaises(ValueError, Command.create, 'asdf', 'ee')
 
-    def test_address_out_of_range(self):
-        self.assertRaises(ValueError, Command.create, 'nop', -1)
-        self.assertRaises(ValueError, Command.create, 'nop', 0x20)
+    def test_startCommand(self):
+        self.assertIsInstance(Command.create('start', 'ee'), StartCommand)
 
-    def test_data_out_of_range(self):
-        self.assertRaises(ValueError, Command.create, 'nop', 0, -1)
-        self.assertRaises(ValueError, Command.create, 'nop', 0, 256)
+    def test_stopCommand(self):
+        self.assertIsInstance(Command.create('stop', 'ee'), StopCommand)
 
-    def test_get_bytelist_nop(self):
-        cmd = Command.create('nop')
-        self.assertEqual(cmd.get_bytelist(), [0x00, 0x00])
+    def test_getPvCommand(self):
+        self.assertIsInstance(Command.create('getPv', 'ee'), GetPvCommand)
 
-    def test_page_out_of_range(self):
-        self.assertRaises(ValueError, Command.create, 'page_sel', -1)
-        self.assertRaises(ValueError, Command.create, 'page_sel', 5)
+    def test_getSvCommand(self):
+        self.assertIsInstance(Command.create('getSv', 'ee'), GetSvCommand)
 
-    def test_get_bytelist_page_sel(self):
-        cmd = Command.create('page_sel')
-        self.assertEqual(cmd.get_bytelist(), [0x10, 0x00])
+    def test_getStepTimeCommand(self):
+        self.assertIsInstance(Command.create('getStepTime', 'ee'), GetStepTimeCommand)
 
-    def test_get_bytelist_read(self):
-        cmd = Command.create('read')
-        self.assertEqual(cmd.get_bytelist(), [0x20, 0x00])
-
-    def test_get_bytelist_write(self):
-        cmd = Command.create('write')
-        self.assertEqual(cmd.get_bytelist(), [0x40, 0x00])
-
-    def test_get_bytelist_quit(self):
-        cmd = Command.create('quit')
-        self.assertEqual(cmd.get_bytelist(), [0x60, 0x00])
-
-    def test_get_bytelist_reset(self):
-        cmd = Command.create('reset')
-        self.assertEqual(cmd.get_bytelist(), [0x80, 0x00])
-
-    def test_get_bytelist_row_read(self):
-        cmd = Command.create('row_read')
-        self.assertEqual(cmd.get_bytelist(), [0xa0, 0x00])
-
-    def test_get_bytelist_convert(self):
-        cmd = Command.create('convert')
-        self.assertEqual(cmd.get_bytelist(), [0xc0, 0x00])
-
-    def test_get_bytelist_exposure(self):
-        cmd = Command.create('exposure')
-        self.assertEqual(cmd.get_bytelist(), [0xe0, 0x00])
-
-    def test_string_representation(self):
-        command = Command.create('write', 0x05, 0x83)
-        str_rep = 'command name: write, address: 0x05, data: 0x83'
-        self.assertEqual(str(command), str_rep)
+    def test_getTotalTimeCommand(self):
+        self.assertIsInstance(Command.create('getTotalTime', 'ee'), GetTotalTimeCommand)
 
 if __name__ == '__main__':
     unittest.main()
