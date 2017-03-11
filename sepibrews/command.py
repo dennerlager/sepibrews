@@ -6,23 +6,6 @@ import sys
 class Command():
     """Use factory method 'create(command_name)' to instantiate"""
 
-    @staticmethod
-    def create(command_name, executionEngine):
-        if command_name == 'start':
-            return StartCommand(executionEngine)
-        elif command_name == 'stop':
-            return StopCommand(executionEngine)
-        elif command_name == 'getPv':
-            return GetPvCommand(executionEngine)
-        elif command_name == 'getSv':
-            return GetSvCommand(executionEngine)
-        elif command_name == 'getStepTime':
-            return GetStepTimeCommand(executionEngine)
-        elif command_name == 'getTotalTime':
-            return GetTotalTimeCommand(executionEngine)
-        else:
-            raise ValueError("no such command: {}".format(command_name))
-
     def __init__(self, executionEngine):
         self.executionEngine = executionEngine
 
@@ -46,33 +29,49 @@ class GetSvCommand(Command):
     def execute(self):
         return self.executionEngine.getSetValue()
 
-class GetStepTimeCommand(Command):
+class GetRemainingStepTimeCommand(Command):
     pass        
 
-class GetTotalTimeCommand(Command):
-    pass        
+class GetTotalRemainingTimeCommand(Command):
+    def execute(self):
+        return self.executionEngine.getTotalRemainingTime()
+
+commands = {'start': StartCommand,
+            'stop': StopCommand,
+            'getPv': GetPvCommand,
+            'getSv': GetSvCommand,
+            'getRemainingStepTime': GetRemainingStepTimeCommand,
+            'getTotalRemainingTime': GetTotalRemainingTimeCommand, }
+
+def create(command_name, executionEngine):
+    try:
+        return commands[command_name](executionEngine)
+    except KeyError:
+        raise ValueError("no such command: {}".format(command_name))
 
 class CommandCreationTest(unittest.TestCase):
     def test_instantiate_raises(self):
-        self.assertRaises(ValueError, Command.create, 'asdf', 'ee')
+        self.assertRaises(ValueError, create, 'asdf', 'ee')
 
     def test_startCommand(self):
-        self.assertIsInstance(Command.create('start', 'ee'), StartCommand)
+        self.assertIsInstance(create('start', 'ee'), StartCommand)
 
     def test_stopCommand(self):
-        self.assertIsInstance(Command.create('stop', 'ee'), StopCommand)
+        self.assertIsInstance(create('stop', 'ee'), StopCommand)
 
     def test_getPvCommand(self):
-        self.assertIsInstance(Command.create('getPv', 'ee'), GetPvCommand)
+        self.assertIsInstance(create('getPv', 'ee'), GetPvCommand)
 
     def test_getSvCommand(self):
-        self.assertIsInstance(Command.create('getSv', 'ee'), GetSvCommand)
+        self.assertIsInstance(create('getSv', 'ee'), GetSvCommand)
 
-    def test_getStepTimeCommand(self):
-        self.assertIsInstance(Command.create('getStepTime', 'ee'), GetStepTimeCommand)
+    def test_getRemainingStepTimeCommand(self):
+        self.assertIsInstance(create('getRemainingStepTime', 'ee'),
+                              GetRemainingStepTimeCommand)
 
-    def test_getTotalTimeCommand(self):
-        self.assertIsInstance(Command.create('getTotalTime', 'ee'), GetTotalTimeCommand)
+    def test_getTotalRemainingTimeCommand(self):
+        self.assertIsInstance(create('getTotalRemainingTime', 'ee'),
+                              GetTotalRemainingTimeCommand)
 
 if __name__ == '__main__':
     unittest.main()

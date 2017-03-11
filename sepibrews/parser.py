@@ -8,7 +8,7 @@ class Parser():
         self.ee = executionEngine
 
     def parse(self, commandname):
-        return command.Command.create(commandname, self.ee)
+        return command.create(commandname, self.ee)
 
 class ParserTest(unittest.TestCase):
     def setUp(self):

@@ -79,6 +79,9 @@ class ExecutionEngine(Process):
     def getTemperature(self):
         return self.tempController.getTemperature()
 
+    def getTotalRemainingTime(self):
+        pass
+
 if __name__ == '__main__':
     qToEe = Queue()
     qFromEe = Queue()
