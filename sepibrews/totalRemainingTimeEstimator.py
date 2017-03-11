@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import unittest
 from recipe_builder import RecipeBuilder
 
-class TotalRemainingTimeEstimater():
+class TotalRemainingTimeEstimator():
     """There are two different states to consider:
     - the controller is still heating up to the next target temperature
     - the target temperature is reached and hold time is ticking """
@@ -31,9 +31,9 @@ class TotalRemainingTimeEstimater():
         deltaT = toTempC - fromTempC
         return deltaT / self.temperatureChangeRateCperSec
 
-class TotalRemainingTimeEstimaterTest(unittest.TestCase):
+class TotalRemainingTimeEstimatorTest(unittest.TestCase):
     def setUp(self):
-        self.e = TotalRemainingTimeEstimater('./recipes/test.csv', 1)
+        self.e = TotalRemainingTimeEstimator('./recipes/test.csv', 1)
 
     def test_estimateRemainingSeconds(self):
         self.assertEqual(self.e.estimateRemainingSeconds(currentStep=1,
