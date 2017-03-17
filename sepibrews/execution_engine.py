@@ -11,6 +11,7 @@ from cn7800 import Cn7800
 from cn7800mock import Cn7800Mock
 from recipe_builder import RecipeBuilder
 from parser import Parser
+from totalRemainingTimeEstimator import TotalRemainingTimeEstimator
 sys.path.append('./recipes/')
 
 class ExecutionEngine(Process):
@@ -20,6 +21,9 @@ class ExecutionEngine(Process):
         self.outq = outq
         self.recipe = RecipeBuilder().parse(recipe)                
         self.parser = Parser(self)
+        self.isStepTempReached = False
+        self.elapsedStepTime = 0
+        self.currentStep = 0
         try:
             self.tempController = Cn7800(slaveAddress)
         except SerialException:
@@ -43,8 +47,11 @@ class ExecutionEngine(Process):
 
     def execute(self):
         self.tempController.start()
-        for step in self.recipe:
+        for stepindex, step in enumerate(self.recipe):
+            self.currentStep = stepindex
+            self.isStepTempReached = False
             self.waitTillTempReached(step.temperatureC)
+            self.isStepTempReached = True
             self.holdTemperatureFor(step.durationMin)
         self.stopExecution()
 
@@ -70,6 +77,7 @@ class ExecutionEngine(Process):
         stopTime = startTime + durationSec
         with progressbar.ProgressBar(max_value=durationSec) as bar:
             while time.time() < stopTime:
+                self.elapsedStepTime = time.time() - startTime
                 self.handleCommunication()
                 bar.update(min((time.time() - startTime, durationSec)))
 
@@ -80,7 +88,13 @@ class ExecutionEngine(Process):
         return self.tempController.getTemperature()
 
     def getTotalRemainingTime(self):
-        pass
+        return (TotalRemainingTimeEstimator(
+            self.recipe,
+            self.tempController.temperatureChangeRateCperSec)
+                .estimateRemainingSeconds(self.currentStep,
+                                          self.getTemperature(), 
+                                          self.elapsedStepTime,
+                                          self.isStepTempReached))
 
 if __name__ == '__main__':
     qToEe = Queue()

@@ -30,7 +30,8 @@ class GetSvCommand(Command):
         return self.executionEngine.getSetValue()
 
 class GetRemainingStepTimeCommand(Command):
-    pass        
+    def execute(self):
+        return self.executionEngine.getRemainingStepTime()
 
 class GetTotalRemainingTimeCommand(Command):
     def execute(self):
