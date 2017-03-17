@@ -11,21 +11,21 @@ class RecipeBuilder():
         recipe = Recipe()
         with open (filename, 'rb') as filehandle:
             self.throwAwayHeaderLine(filehandle)
-            reader = csv.reader(filehandle, dialect=dsv.DsvDialect)            
+            reader = csv.reader(filehandle, dialect=dsv.DsvDialect)
             for line in reader:
                 recipe.appendStep(self.parseline(line))
         return recipe
- 
+
     def throwAwayHeaderLine(self, filehandle):
         filehandle.readline()
 
     def parseline(self, line):
-        return Step(float(line[0]), float(line[1]))
+        return Step(float(line[0]), float(line[1])*60)
 
 class RecipeBuilderTest(unittest.TestCase):
     def setUp(self):
         self.rb = RecipeBuilder()
-        self.recipe = self.rb.parse('./recipes/lager.csv')
+        self.recipe = self.rb.parse('./recipes/test.csv')
 
     def test_parseReturnsRecipe(self):
         self.assertIsInstance(self.recipe, Recipe)
@@ -33,14 +33,14 @@ class RecipeBuilderTest(unittest.TestCase):
     def test_parseFirstStepTemperature(self):
         self.assertEqual(self.recipe.steps[0].temperatureC, 30)
 
-    def test_parseFirstStepDurationMin(self):
-        self.assertEqual(self.recipe.steps[0].durationMin, 1)
+    def test_parseFirstStepDurationSec(self):
+        self.assertEqual(self.recipe.steps[0].durationSec, 6)
 
     def test_parseLastStepTemperature(self):
-        self.assertEqual(self.recipe.steps[-1].temperatureC, 50)
+        self.assertEqual(self.recipe.steps[-1].temperatureC, 40)
 
-    def test_parseLastStepDurationMin(self):
-        self.assertEqual(self.recipe.steps[-1].durationMin, 3)
+    def test_parseLastStepDurationSec(self):
+        self.assertEqual(self.recipe.steps[-1].durationSec, 12)
 
 if __name__ == '__main__':
     unittest.main()

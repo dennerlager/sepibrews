@@ -9,7 +9,7 @@ class Cn7800Mock():
         self.setValue = 25
         self.atTemperature = True
         self.timeTemperatureSet = time.time()
-        
+
     def getTemperature(self):
         if self.atTemperature:
             return self.setValue
@@ -30,10 +30,9 @@ class Cn7800Mock():
 
     def getSetValue(self):
         return self.setValue
-        
+
     def start(self):
         pass
 
     def stop(self):
         pass
-        

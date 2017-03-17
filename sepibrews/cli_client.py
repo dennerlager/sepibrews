@@ -15,6 +15,10 @@ def printAvailableCommands():
     print('q to quit')
 
 def manualTest():
+    qToEe = Queue()
+    qFromEe = Queue()
+    ee = ExecutionEngine(1, qToEe, qFromEe, './recipes/test.csv')
+    ee.start()
     printAvailableCommands()
     while True:
         command = raw_input('command: ')
@@ -28,41 +32,46 @@ def manualTest():
         except Empty:
             print('timed out')
 
-def transceive(commandname):
-    print('send command {}'.format(commandname))
-    qToEe.put(commandname)    
+class AutomaticTest(unittest.TestCase):
+    def setUp(self):
+        self.qToEe = Queue()
+        self.qFromEe = Queue()
+        self.ee = ExecutionEngine(1, self.qToEe, self.qFromEe, './recipes/test.csv')
+        self.ee.start()
+
+    def tearDown(self):
+        self.transceive('stop')
+        self.ee.join()
+
+    def test_flow(self):
+        self.assertEqual(self.transceive('start'), 'timed out')
+        self.assertAlmostEqual(self.transceive('getPv'), 26, delta=1)
+        self.assertEqual(self.transceive('getSv'), 30)
+        self.assertAlmostEqual(self.transceive('getTotalRemainingTime'), 32, delta=1)
+        time.sleep(6)
+        self.assertAlmostEqual(self.transceive('getRemainingStepTime'), 4.5, delta=1)
+
+    def transceive(self, commandname):
+        self.qToEe.put(commandname)
+        try:
+            return float(self.qFromEe.get(block=True, timeout=1))
+        except Empty:
+            return 'timed out'
+
+if __name__ == '__main__':
     try:
-        print('respone: {}'.format(qFromEe.get(block=True, timeout=1)))
-    except Empty:
-        print('timed out')
+        response = sys.argv[1]
+    except IndexError:
+        pass
+    while True:
+        if response == 'a' or response == 'm':
+            break
+        response = raw_input('automatic (a) or manual (m) test?: ')
 
-def automaticTest():
-    transceive('start')
-    time.sleep(1)
-    transceive('getPv')
-    time.sleep(1)
-    transceive('getSv')
-    time.sleep(1)
-    transceive('getTotalRemainingTime')
-    time.sleep(1)
-
-qToEe = Queue()
-qFromEe = Queue()
-slaveAddress = 1
-ee = ExecutionEngine(slaveAddress, qToEe, qFromEe, './recipes/test.csv')
-ee.start()
-try:
-    response = sys.argv[1]
-except IndexError:
-    pass
-while True:
-    if response == 'a' or response == 'm':
-        break
-    response = raw_input('automatic (a) or manual (m) test?: ')
-    
-if response.startswith('m'):
-    manualTest()
-if response.startswith('a'):
-    automaticTest()
-qToEe.put('stop')
-ee.join()
+    if response.startswith('m'):
+        manualTest()
+    if response.startswith('a'):
+        sys.argv.pop()
+        unittest.main()
+    qToEe.put('stop')
+    ee.join()

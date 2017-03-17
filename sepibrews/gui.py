@@ -41,9 +41,9 @@ class Brew(tk.Frame):
         self.recipeListFrame = tk.Frame(self.subframe1)
         self.recipeListFrame.pack(side=tk.TOP)
         scrollbar = tk.Scrollbar(self.recipeListFrame, orient=tk.VERTICAL)
-        self.recipeList = tk.Listbox(self.recipeListFrame, 
-                                     selectmode=tk.SINGLE, 
-                                     yscrollcommand=scrollbar.set, 
+        self.recipeList = tk.Listbox(self.recipeListFrame,
+                                     selectmode=tk.SINGLE,
+                                     yscrollcommand=scrollbar.set,
                                      height=3)
         scrollbar.config(command=self.recipeList.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -76,6 +76,6 @@ if __name__ == '__main__':
     root.attributes('-fullscreen', True)
     root.option_add('*Font', 'DejaVuSans 20')
     # default_font = root.Font.nametofont('TkDefaultFont')
-    # default_font.configure(size=48) 
+    # default_font.configure(size=48)
     myapp = Sepis(root)
     root.mainloop()

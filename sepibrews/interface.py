@@ -19,4 +19,3 @@ class Interface():
 
     def writeRegister(self, address, data):
         self.dev.write_register(address, data, functioncode=6)
-     

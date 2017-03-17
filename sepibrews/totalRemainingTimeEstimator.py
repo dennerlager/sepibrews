@@ -22,9 +22,9 @@ class TotalRemainingTimeEstimator():
                 continue
             if not isStepTempReached:
                 timeLeft += self.getHeatTime(currentTemp, step.temperatureC)
-                timeLeft += step.durationMin * 60
+                timeLeft += step.durationSec
             else:
-                timeLeft += step.durationMin * 60 - elapsedStepTime
+                timeLeft += step.durationSec - elapsedStepTime
             currentTemp = step.temperatureC
             isStepTempReached = False
         return timeLeft

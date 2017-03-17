@@ -36,7 +36,7 @@ class Cn7800():
 
     def stop(self):
         self.writeBit('control_run_stop', False)
-        
+
 class Cn7800test(unittest.TestCase):
     def setUp(self):
         self.tc = Cn7800(1)

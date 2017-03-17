@@ -143,9 +143,9 @@ class Instrument():
 
         New in version 0.5.
         """
-        
+
         self.handle_local_echo = False
-        """Set to to :const:`True` if your RS-485 adaptor has local echo enabled. 
+        """Set to to :const:`True` if your RS-485 adaptor has local echo enabled.
         Then the transmitted message will immeadiately appear at the receive line of the RS-485 adaptor.
         MinimalModbus will then read and discard this data, before reading the data from the slave.
         Defaults to :const:`False`.
@@ -841,8 +841,8 @@ class Instrument():
 
         For Python3, the information sent to and from pySerial should be of the type bytes.
         This is taken care of automatically by MinimalModbus.
-        
-        
+
+
 
         """
 
@@ -896,12 +896,12 @@ class Instrument():
         if self.handle_local_echo:
             localEchoToDiscard = self.serial.read(len(request))
             if self.debug:
-                template = 'MinimalModbus debug mode. Discarding this local echo: {!r} ({} bytes).' 
+                template = 'MinimalModbus debug mode. Discarding this local echo: {!r} ({} bytes).'
                 text = template.format(localEchoToDiscard, len(localEchoToDiscard))
                 _print_out(text)
             if localEchoToDiscard != request:
                 template = 'Local echo handling is enabled, but the local echo does not match the sent request. ' + \
-                    'Request: {!r} ({} bytes), local echo: {!r} ({} bytes).' 
+                    'Request: {!r} ({} bytes), local echo: {!r} ({} bytes).'
                 text = template.format(request, len(request), localEchoToDiscard, len(localEchoToDiscard))
                 raise IOError(text)
 
@@ -911,7 +911,7 @@ class Instrument():
             answer = ':' + answer.split(':')[1].strip() + '\r\n'
         except IndexError:
             pass
-        
+
         _LATEST_READ_TIMES[self.serial.port] = time.time()
 
         if self.close_port_after_each_call:
@@ -1687,7 +1687,7 @@ def _hexencode(bytestring, insert_spaces = False):
     _checkString(bytestring, description='byte string')
 
     separator = '' if not insert_spaces else ' '
-    
+
     # Use plain string formatting instead of binhex.hexlify,
     # in order to have it Python 2.x and 3.x compatible
 
@@ -1740,9 +1740,9 @@ def _hexdecode(hexstring):
 
 def _hexlify(bytestring):
     """Convert a byte string to a hex encoded string, with spaces for easier reading.
-    
+
     This is just a facade for _hexencode() with insert_spaces = True.
-    
+
     See _hexencode() for details.
 
     """
@@ -1919,33 +1919,33 @@ def _setBitOn(x, bitNum):
 ############################
 
 _CRC16TABLE = (
-        0, 49345, 49537,   320, 49921,   960,   640, 49729, 50689,  1728,  1920, 
-    51009,  1280, 50625, 50305,  1088, 52225,  3264,  3456, 52545,  3840, 53185, 
-    52865,  3648,  2560, 51905, 52097,  2880, 51457,  2496,  2176, 51265, 55297, 
-     6336,  6528, 55617,  6912, 56257, 55937,  6720,  7680, 57025, 57217,  8000, 
-    56577,  7616,  7296, 56385,  5120, 54465, 54657,  5440, 55041,  6080,  5760, 
-    54849, 53761,  4800,  4992, 54081,  4352, 53697, 53377,  4160, 61441, 12480, 
-    12672, 61761, 13056, 62401, 62081, 12864, 13824, 63169, 63361, 14144, 62721, 
-    13760, 13440, 62529, 15360, 64705, 64897, 15680, 65281, 16320, 16000, 65089, 
-    64001, 15040, 15232, 64321, 14592, 63937, 63617, 14400, 10240, 59585, 59777, 
-    10560, 60161, 11200, 10880, 59969, 60929, 11968, 12160, 61249, 11520, 60865, 
-    60545, 11328, 58369,  9408,  9600, 58689,  9984, 59329, 59009,  9792,  8704, 
-    58049, 58241,  9024, 57601,  8640,  8320, 57409, 40961, 24768, 24960, 41281, 
-    25344, 41921, 41601, 25152, 26112, 42689, 42881, 26432, 42241, 26048, 25728, 
-    42049, 27648, 44225, 44417, 27968, 44801, 28608, 28288, 44609, 43521, 27328, 
-    27520, 43841, 26880, 43457, 43137, 26688, 30720, 47297, 47489, 31040, 47873, 
-    31680, 31360, 47681, 48641, 32448, 32640, 48961, 32000, 48577, 48257, 31808, 
-    46081, 29888, 30080, 46401, 30464, 47041, 46721, 30272, 29184, 45761, 45953, 
-    29504, 45313, 29120, 28800, 45121, 20480, 37057, 37249, 20800, 37633, 21440, 
-    21120, 37441, 38401, 22208, 22400, 38721, 21760, 38337, 38017, 21568, 39937, 
-    23744, 23936, 40257, 24320, 40897, 40577, 24128, 23040, 39617, 39809, 23360, 
-    39169, 22976, 22656, 38977, 34817, 18624, 18816, 35137, 19200, 35777, 35457, 
-    19008, 19968, 36545, 36737, 20288, 36097, 19904, 19584, 35905, 17408, 33985, 
-    34177, 17728, 34561, 18368, 18048, 34369, 33281, 17088, 17280, 33601, 16640, 
+        0, 49345, 49537,   320, 49921,   960,   640, 49729, 50689,  1728,  1920,
+    51009,  1280, 50625, 50305,  1088, 52225,  3264,  3456, 52545,  3840, 53185,
+    52865,  3648,  2560, 51905, 52097,  2880, 51457,  2496,  2176, 51265, 55297,
+     6336,  6528, 55617,  6912, 56257, 55937,  6720,  7680, 57025, 57217,  8000,
+    56577,  7616,  7296, 56385,  5120, 54465, 54657,  5440, 55041,  6080,  5760,
+    54849, 53761,  4800,  4992, 54081,  4352, 53697, 53377,  4160, 61441, 12480,
+    12672, 61761, 13056, 62401, 62081, 12864, 13824, 63169, 63361, 14144, 62721,
+    13760, 13440, 62529, 15360, 64705, 64897, 15680, 65281, 16320, 16000, 65089,
+    64001, 15040, 15232, 64321, 14592, 63937, 63617, 14400, 10240, 59585, 59777,
+    10560, 60161, 11200, 10880, 59969, 60929, 11968, 12160, 61249, 11520, 60865,
+    60545, 11328, 58369,  9408,  9600, 58689,  9984, 59329, 59009,  9792,  8704,
+    58049, 58241,  9024, 57601,  8640,  8320, 57409, 40961, 24768, 24960, 41281,
+    25344, 41921, 41601, 25152, 26112, 42689, 42881, 26432, 42241, 26048, 25728,
+    42049, 27648, 44225, 44417, 27968, 44801, 28608, 28288, 44609, 43521, 27328,
+    27520, 43841, 26880, 43457, 43137, 26688, 30720, 47297, 47489, 31040, 47873,
+    31680, 31360, 47681, 48641, 32448, 32640, 48961, 32000, 48577, 48257, 31808,
+    46081, 29888, 30080, 46401, 30464, 47041, 46721, 30272, 29184, 45761, 45953,
+    29504, 45313, 29120, 28800, 45121, 20480, 37057, 37249, 20800, 37633, 21440,
+    21120, 37441, 38401, 22208, 22400, 38721, 21760, 38337, 38017, 21568, 39937,
+    23744, 23936, 40257, 24320, 40897, 40577, 24128, 23040, 39617, 39809, 23360,
+    39169, 22976, 22656, 38977, 34817, 18624, 18816, 35137, 19200, 35777, 35457,
+    19008, 19968, 36545, 36737, 20288, 36097, 19904, 19584, 35905, 17408, 33985,
+    34177, 17728, 34561, 18368, 18048, 34369, 33281, 17088, 17280, 33601, 16640,
     33217, 32897, 16448)
 """CRC-16 lookup table with 256 elements.
-    Built with this code:    
-    
+    Built with this code:
+
     poly=0xA001
     table = []
     for index in range(256):
@@ -1978,13 +1978,13 @@ def _calculateCrcString(inputstring):
 
     """
     _checkString(inputstring, description='input CRC string')
- 
+
     # Preload a 16-bit register with ones
     register = 0xFFFF
 
     for char in inputstring:
         register = (register >> 8) ^ _CRC16TABLE[(register ^ ord(char)) & 0xFF]
- 
+
     return _numToTwoByteString(register, LsbFirst=True)
 
 
@@ -2364,7 +2364,7 @@ def _print_out(inputstring):
 
 def _interpretRawMessage(inputstr):
     r"""Generate a human readable description of a Modbus bytestring.
-    
+
     Args:
         inputstr (str): The bytestring that should be interpreted.
 
@@ -2372,25 +2372,25 @@ def _interpretRawMessage(inputstr):
         A descriptive string.
 
     For example, the string ``'\n\x03\x10\x01\x00\x01\xd0q'`` should give something like::
-        
+
         TODO: update
-    
+
         Modbus bytestring decoder
         Input string (length 8 characters): '\n\x03\x10\x01\x00\x01\xd0q'
         Probably modbus RTU mode.
         Slave address: 10 (dec). Function code: 3 (dec).
         Valid message. Extracted payload: '\x10\x01\x00\x01'
 
-        Pos   Character Hex  Dec  Probable interpretation 
+        Pos   Character Hex  Dec  Probable interpretation
         -------------------------------------------------
-          0:  '\n'      0A    10  Slave address 
-          1:  '\x03'    03     3  Function code 
-          2:  '\x10'    10    16  Payload    
-          3:  '\x01'    01     1  Payload    
-          4:  '\x00'    00     0  Payload    
-          5:  '\x01'    01     1  Payload    
-          6:  '\xd0'    D0   208  Checksum, CRC LSB 
-          7:  'q'       71   113  Checksum, CRC MSB 
+          0:  '\n'      0A    10  Slave address
+          1:  '\x03'    03     3  Function code
+          2:  '\x10'    10    16  Payload
+          3:  '\x01'    01     1  Payload
+          4:  '\x00'    00     0  Payload
+          5:  '\x01'    01     1  Payload
+          6:  '\xd0'    D0   208  Checksum, CRC LSB
+          7:  'q'       71   113  Checksum, CRC MSB
 
     """
     raise NotImplementedError()
@@ -2442,23 +2442,23 @@ def _interpretRawMessage(inputstr):
             else:
                 description = 'Payload'
             output += '{0:3.0f}:  {1!r:<8}  {2:02X}  {2: 4.0f}  {3:<10} \n'.format(i, character, ord(character), description)
-        
+
     elif mode == MODE_ASCII:
         output += '\nPos   Character(s) Converted  Hex  Dec  Probable interpretation \n'
         output += '--------------------------------------------------------------- \n'
-        
+
         i = 0
         while i < len(inputstr):
-            
+
             if inputstr[i] in [':', '\r', '\n']:
-                if inputstr[i] == ':': 
+                if inputstr[i] == ':':
                     description = 'Start character'
                 else:
                     description = 'Stop character'
-                    
+
                 output += '{0:3.0f}:  {1!r:<8}                          {2} \n'.format(i, inputstr[i], description)
                 i += 1
-                
+
             else:
                 if i == 1:
                     description = 'Slave address'
@@ -2468,27 +2468,27 @@ def _interpretRawMessage(inputstr):
                     description = 'Checksum (LRC)'
                 else:
                     description = 'Payload'
-                
+
                 try:
                     hexvalue = _hexdecode(inputstr[i:i+2])
                     output +=  '{0:3.0f}:  {1!r:<8}     {2!r}     {3:02X}  {3: 4.0f}  {4} \n'.format(i, inputstr[i:i+2], hexvalue, ord(hexvalue), description)
                 except:
                     output +=  '{0:3.0f}:  {1!r:<8}     ?           ?     ?  {2} \n'.format(i, inputstr[i:i+2], description)
                 i += 2
-        
+
     # Generate description for the payload
     output += '\n\n'
     try:
         output += _interpretPayload(functioncode, extractedpayload)
     except:
         output += '\nCould not interpret the payload. \n\n' # Payload or function code not available
-    
+
     return output
-    
+
 
 def _interpretPayload(functioncode, payload):
     r"""Generate a human readable description of a Modbus payload.
-    
+
     Args:
       * functioncode (int): Function code
       * payload (str): The payload that should be interpreted. It should be a byte string.
@@ -2497,9 +2497,9 @@ def _interpretPayload(functioncode, payload):
         A descriptive string.
 
     For example, the payload ``'\x10\x01\x00\x01'`` for functioncode 3 should give something like::
-    
+
         TODO: Update
-    
+
 
     """
     raise NotImplementedError()
@@ -2507,7 +2507,7 @@ def _interpretPayload(functioncode, payload):
     output += 'Modbus payload decoder\n'
     output += 'Input payload (length {} characters): {!r} \n'.format(len(payload), payload)
     output += 'Function code: {} (dec).\n'.format(functioncode)
-    
+
     if len(payload) == 4:
         FourbyteMessageFirstHalfValue = _twoByteStringToNum(payload[0:2])
         FourbyteMessageSecondHalfValue = _twoByteStringToNum(payload[2:4])
@@ -2553,4 +2553,3 @@ def _getDiagnosticString():
     text += '\n'.join(sys.path) + '\n'
     text += '\n## End of diagnostic output ## \n'
     return text
-

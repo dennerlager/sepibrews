@@ -16,10 +16,10 @@ sys.path.append('./recipes/')
 
 class ExecutionEngine(Process):
     def __init__(self, slaveAddress, inq, outq, recipe):
-        Process.__init__(self)        
+        Process.__init__(self)
         self.inq = inq
         self.outq = outq
-        self.recipe = RecipeBuilder().parse(recipe)                
+        self.recipe = RecipeBuilder().parse(recipe)
         self.parser = Parser(self)
         self.isStepTempReached = False
         self.elapsedStepTime = 0
@@ -52,7 +52,7 @@ class ExecutionEngine(Process):
             self.isStepTempReached = False
             self.waitTillTempReached(step.temperatureC)
             self.isStepTempReached = True
-            self.holdTemperatureFor(step.durationMin)
+            self.holdTemperatureFor(step.durationSec)
         self.stopExecution()
 
     def stopExecution(self):
@@ -70,11 +70,12 @@ class ExecutionEngine(Process):
                 bar.update(i)
                 i += 1
 
-    def holdTemperatureFor(self, durationMin):
-        print('hold temperature for {}minutes'.format(durationMin))
-        durationSec = int(durationMin * 60)
+    def holdTemperatureFor(self, durationSec):
+        print('hold temperature for {}seconds'.format(durationSec))
+        durationSec = int(durationSec)
         startTime = time.time()
         stopTime = startTime + durationSec
+        self.elapsedStepTime = 0
         with progressbar.ProgressBar(max_value=durationSec) as bar:
             while time.time() < stopTime:
                 self.elapsedStepTime = time.time() - startTime
@@ -92,13 +93,16 @@ class ExecutionEngine(Process):
             self.recipe,
             self.tempController.temperatureChangeRateCperSec)
                 .estimateRemainingSeconds(self.currentStep,
-                                          self.getTemperature(), 
+                                          self.getTemperature(),
                                           self.elapsedStepTime,
                                           self.isStepTempReached))
+
+    def getRemainingStepTime(self):
+        return self.recipe.steps[self.currentStep].durationSec - self.elapsedStepTime
 
 if __name__ == '__main__':
     qToEe = Queue()
     qFromEe = Queue()
-    from cn7800mock import Cn7800Mock as Cn7800    
+    from cn7800mock import Cn7800Mock as Cn7800
     ee = ExecutionEngine(1, qToEe, qFromEe, './recipes/test.csv')
     ee.execute()
