@@ -40,8 +40,8 @@ class AutomaticTest(unittest.TestCase):
         self.qToEe = Queue()
         self.qFromEe = Queue()
         self.ee = ExecutionEngine(1, self.qToEe, self.qFromEe)
-        self.ee.setRecipe('./recipes/test.csv')
         self.ee.start()
+        self.transceive('{} {}'.format('setRecipe', './recipes/test.csv'))
 
     def tearDown(self):
         self.transceive('quit')
@@ -61,6 +61,8 @@ class AutomaticTest(unittest.TestCase):
             return float(self.qFromEe.get(block=True, timeout=1))
         except Empty:
             return 'timed out'
+        except TypeError:
+            pass
 
 if __name__ == '__main__':
     try:

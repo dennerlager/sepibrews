@@ -41,10 +41,10 @@ class ExecutionEngine(Process):
 
     def handleCommunication(self):
         try:
-            commandname = self.inq.get(block=True, timeout=0.5)
+            commandstring = self.inq.get(block=True, timeout=0.5)
         except Empty:
             return
-        command = self.parser.parse(commandname)
+        command = self.parser.parse(commandstring)
         self.outq.put(command.execute())
 
     def execute(self):

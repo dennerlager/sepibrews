@@ -34,12 +34,6 @@ class Brew(tk.Frame):
         self.buttonFrame = ButtonFrame(self, side=tk.LEFT,
                                        padx=10, pady=5,
                                        ipadx=5, ipady=5)
-        self.timeFrame = TimeFrame(self, side=tk.LEFT,
-                                   padx=10, pady=5,
-                                   ipadx=5, ipady=5)
-        self.tempFrame = TempFrame(self, side=tk.LEFT,
-                                   padx=10, pady=5,
-                                   ipadx=5, ipady=5)
 
     def getRecipe(self):
         return self.recipeFrame.getCurrentRecipe()
@@ -79,7 +73,6 @@ class ButtonFrame(tk.Frame):
 
     def makeWidgets(self):
         self.startButton = StartButton(self)
-        self.stopButton = StopButton(self)
 
 class StartButton(tk.Button):
     def __init__(self, parent=None, **options):
@@ -88,58 +81,6 @@ class StartButton(tk.Button):
         self.pack(**options)
         self.config(text='start')
         self.config(command=self.parent.parent.sm.start)
-
-class StopButton(tk.Button):
-    def __init__(self, parent=None, **options):
-        tk.Button.__init__(self, parent)
-        self.parent = parent
-        self.pack(**options)
-        self.config(text='stop')
-        self.config(command=self.parent.parent.sm.stop)
-
-class TimeFrame(tk.Frame):
-    def __init__(self, parent=None, **options):
-        tk.Frame.__init__(self, parent)
-        self.pack(**options)
-        self.makeWidgets()
-
-    def makeWidgets(self):
-        self.totalTimeLeftLabel = TotalTimeLeftLabel(self)
-        self.stepTimeLeftLabel = StepTimeLeftLabel(self)
-
-class TotalTimeLeftLabel(tk.Label):
-    def __init__(self, parent=None, **options):
-        tk.Label.__init__(self, parent)
-        self.pack(**options)
-        self.config(text='total time left (min)')
-
-class StepTimeLeftLabel(tk.Label):
-    def __init__(self, parent=None, **options):
-        tk.Label.__init__(self, parent)
-        self.pack(**options)
-        self.config(text='step time left (min)')
-
-class TempFrame(tk.Frame):
-    def __init__(self, parent=None, **options):
-        tk.Frame.__init__(self, parent)
-        self.pack(**options)
-        self.makeWidgets()
-
-    def makeWidgets(self):
-        self.pvLabel = PvLabel(self)
-        self.svLabel = SvLabel(self)
-
-class PvLabel(tk.Label):
-    def __init__(self, parent=None, **options):
-        tk.Label.__init__(self, parent)
-        self.pack(**options)
-        self.config(text='pv: xx.xxC')
-
-class SvLabel(tk.Label):
-    def __init__(self, parent=None, **options):
-        tk.Label.__init__(self, parent)
-        self.pack(**options)
-        self.config(text='sv: xx.xxC')
 
 class ExitButton(tk.Button):
     def __init__(self, parent=None, **options):

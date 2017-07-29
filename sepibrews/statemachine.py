@@ -9,12 +9,18 @@ class StateMachine():
         self.qToEe = Queue()
         self.qFromEe = Queue()
         self.ee = ExecutionEngine(tempControllerAddress, self.qToEe, self.qFromEe)
+        self.ee.start()
 
     def start(self):
         print('selected recipe: {}'.format(self.brewView.getRecipe()))
-        self.ee.setRecipe(self.brewView.getRecipe())
+        self.qToEe.put('{} {}'.format('setRecipe', self.brewView.getRecipe()))
         self.qToEe.put('start')
 
     def stop(self):
         print('stop pressed')
         self.qToEe.put('stop')
+
+    def quit(self):
+        print('exit')
+        self.qToEe.put('quit')
+        self.ee.join()

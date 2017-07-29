@@ -7,8 +7,10 @@ class Parser():
     def __init__(self, executionEngine):
         self.ee = executionEngine
 
-    def parse(self, commandname):
-        return command.create(commandname, self.ee)
+    def parse(self, commandstring):
+        commandname = commandstring.split(' ')[0]
+        args = commandstring.split(' ')[1:]
+        return command.create(commandname, args, self.ee)
 
 class ParserTest(unittest.TestCase):
     def setUp(self):
