@@ -8,6 +8,7 @@ class Cn7800():
     def __init__(self, slaveAddress):
         self.memory = Memory()
         self.sif = Interface(slaveAddress)
+        self.temperatureChangeRateCperSec = 1/60
 
     def readRegister(self, name):
         return self.sif.readRegister(self.memory.getRegisterAddress(name))

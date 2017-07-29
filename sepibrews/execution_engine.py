@@ -15,20 +15,22 @@ from totalRemainingTimeEstimator import TotalRemainingTimeEstimator
 sys.path.append('./recipes/')
 
 class ExecutionEngine(Process):
-    def __init__(self, slaveAddress, inq, outq, recipe):
+    def __init__(self, tempControllerAddress, inq, outq):
         Process.__init__(self)
         self.inq = inq
         self.outq = outq
-        self.recipe = RecipeBuilder().parse(recipe)
         self.parser = Parser(self)
         self.isStepTempReached = False
         self.elapsedStepTime = 0
         self.currentStep = 0
         try:
-            self.tempController = Cn7800(slaveAddress)
+            self.tempController = Cn7800(tempControllerAddress)
         except SerialException:
             print('interface not found, using mock')
-            self.tempController = Cn7800Mock(slaveAddress)
+            self.tempController = Cn7800Mock(tempControllerAddress)
+
+    def setRecipe(self, recipe):
+        self.recipe = RecipeBuilder().parse(recipe)
 
     def __del__(self):
         self.tempController.stop()
@@ -104,5 +106,6 @@ if __name__ == '__main__':
     qToEe = Queue()
     qFromEe = Queue()
     from cn7800mock import Cn7800Mock as Cn7800
-    ee = ExecutionEngine(1, qToEe, qFromEe, './recipes/test.csv')
+    ee = ExecutionEngine(1, qToEe, qFromEe)
+    ee.setRecipe('./recipes/test.csv')
     ee.execute()

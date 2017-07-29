@@ -2,6 +2,7 @@
 from __future__ import print_function, division
 import os
 import Tkinter as tk
+from statemachine import StateMachine
 
 class Sepis(tk.Frame):
     def __init__(self, parent=None, **options):
@@ -11,26 +12,38 @@ class Sepis(tk.Frame):
         self.master.bind('<Escape>', lambda e: self.quit())
 
     def makeWidgets(self):
-        self.brew1 = Brew(self, padx=10, pady=5, ipadx=5, ipady=5)
-        self.brew2 = Brew(self, padx=10, pady=5, ipadx=5, ipady=5)
+        self.brew1 = Brew(self, tempControllerAddress=1, padx=10, pady=5, ipadx=5, ipady=5)
+        self.brew2 = Brew(self, tempControllerAddress=2, padx=10, pady=5, ipadx=5, ipady=5)
         self.exitButton = ExitButton(self)
 
 class Brew(tk.Frame):
-    def __init__(self, parent=None, **options):
+    def __init__(self, parent=None, tempControllerAddress=None, **options):
         tk.Frame.__init__(self, parent)
+        self.sm = StateMachine(self, tempControllerAddress)
         self.pack(**options)
         self.makeWidgets()
 
     def makeWidgets(self):
         self.recipeFrame = RecipeScrolledList(self, side=tk.LEFT,
-                                            padx=10, pady=5, ipadx=5, ipady=5)
-        self.buttonFrame = ButtonFrame(self, side=tk.LEFT, padx=10, pady=5, ipadx=5, ipady=5)
-        self.timeFrame = TimeFrame(self, side=tk.LEFT, padx=10, pady=5, ipadx=5, ipady=5)
-        self.tempFrame = TempFrame(self, side=tk.LEFT, padx=10, pady=5, ipadx=5, ipady=5)
+                                              padx=10, pady=5,
+                                              ipadx=5, ipady=5)
+        self.buttonFrame = ButtonFrame(self, side=tk.LEFT,
+                                       padx=10, pady=5,
+                                       ipadx=5, ipady=5)
+        self.timeFrame = TimeFrame(self, side=tk.LEFT,
+                                   padx=10, pady=5,
+                                   ipadx=5, ipady=5)
+        self.tempFrame = TempFrame(self, side=tk.LEFT,
+                                   padx=10, pady=5,
+                                   ipadx=5, ipady=5)
+
+    def getRecipe(self):
+        return self.recipeFrame.getCurrentRecipe()
 
 class RecipeScrolledList(tk.Frame):
     def __init__(self, parent=None, **options):
         tk.Frame.__init__(self, parent)
+        self.recipeDirectory = './recipes'
         self.pack(**options)
         self.makeWidgets()
 
@@ -39,17 +52,23 @@ class RecipeScrolledList(tk.Frame):
         self.recipeList = tk.Listbox(self,
                                      selectmode=tk.SINGLE,
                                      yscrollcommand=scrollbar.set,
-                                     height=3)
+                                     height=3,
+                                     exportselection=False)
         scrollbar.config(command=self.recipeList.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.recipeList.pack(side=tk.TOP)
-        for dirpath, dirnames, filenames in os.walk('./recipes/'):
+        for dirpath, dirnames, filenames in os.walk(self.recipeDirectory):
             for filename in sorted(filenames):
                 if filename.endswith('.csv'):
                     self.recipeList.insert(tk.END, filename.split('.csv')[0])
 
+    def getCurrentRecipe(self):
+        return '{}/{}.csv'.format(self.recipeDirectory,
+                                  self.recipeList.get('active'))
+
 class ButtonFrame(tk.Frame):
     def __init__(self, parent=None, **options):
+        self.parent = parent
         tk.Frame.__init__(self, parent)
         self.pack(**options)
         self.makeWidgets()
@@ -60,15 +79,19 @@ class ButtonFrame(tk.Frame):
 
 class StartButton(tk.Button):
     def __init__(self, parent=None, **options):
+        self.parent = parent
         tk.Button.__init__(self, parent)
         self.pack(**options)
         self.config(text='start')
+        self.config(command=self.parent.parent.sm.start)
 
 class StopButton(tk.Button):
     def __init__(self, parent=None, **options):
         tk.Button.__init__(self, parent)
+        self.parent = parent
         self.pack(**options)
         self.config(text='stop')
+        self.config(command=self.parent.parent.sm.stop)
 
 class TimeFrame(tk.Frame):
     def __init__(self, parent=None, **options):
@@ -117,12 +140,14 @@ class SvLabel(tk.Label):
 class ExitButton(tk.Button):
     def __init__(self, parent=None, **options):
         tk.Button.__init__(self, parent)
+        self.parent = parent
         self.pack(**options)
         self.config(text='exit')
+        self.config(command=self.quit)
 
 if __name__ == '__main__':
     root = tk.Tk()
-    root.attributes('-fullscreen', True)
+    # root.attributes('-fullscreen', True)
     root.option_add('*Font', 'DejaVuSans 20')
     myapp = Sepis(root)
     root.mainloop()

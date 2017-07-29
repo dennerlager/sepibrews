@@ -19,6 +19,10 @@ class StartCommand(Command):
 class StopCommand(Command):
     def execute(self):
         self.executionEngine.stopExecution()
+
+class QuitCommand(Command):
+    def execute(self):
+        self.executionEngine.stopExecution()
         sys.exit()
 
 class GetPvCommand(Command):
@@ -39,6 +43,7 @@ class GetTotalRemainingTimeCommand(Command):
 
 commands = {'start': StartCommand,
             'stop': StopCommand,
+            'quit': QuitCommand,
             'getPv': GetPvCommand,
             'getSv': GetSvCommand,
             'getRemainingStepTime': GetRemainingStepTimeCommand,
@@ -59,6 +64,9 @@ class CommandCreationTest(unittest.TestCase):
 
     def test_stopCommand(self):
         self.assertIsInstance(create('stop', 'ee'), StopCommand)
+
+    def test_quitCommand(self):
+        self.assertIsInstance(create('quit', 'ee'), QuitCommand)
 
     def test_getPvCommand(self):
         self.assertIsInstance(create('getPv', 'ee'), GetPvCommand)

@@ -17,7 +17,8 @@ def printAvailableCommands():
 def manualTest():
     qToEe = Queue()
     qFromEe = Queue()
-    ee = ExecutionEngine(1, qToEe, qFromEe, './recipes/test.csv')
+    ee = ExecutionEngine(1, qToEe, qFromEe)
+    ee.setRecipe('./recipes/test.csv')
     ee.start()
     printAvailableCommands()
     while True:
@@ -31,16 +32,19 @@ def manualTest():
             print('respone: {}'.format(qFromEe.get(block=True, timeout=1)))
         except Empty:
             print('timed out')
+    qToEe.put('quit')
+    ee.join()
 
 class AutomaticTest(unittest.TestCase):
     def setUp(self):
         self.qToEe = Queue()
         self.qFromEe = Queue()
-        self.ee = ExecutionEngine(1, self.qToEe, self.qFromEe, './recipes/test.csv')
+        self.ee = ExecutionEngine(1, self.qToEe, self.qFromEe)
+        self.ee.setRecipe('./recipes/test.csv')
         self.ee.start()
 
     def tearDown(self):
-        self.transceive('stop')
+        self.transceive('quit')
         self.ee.join()
 
     def test_flow(self):
@@ -62,16 +66,19 @@ if __name__ == '__main__':
     try:
         response = sys.argv[1]
     except IndexError:
-        pass
+        response = None
     while True:
         if response == 'a' or response == 'm':
             break
         response = raw_input('automatic (a) or manual (m) test?: ')
 
-    if response.startswith('m'):
+    if response == 'm':
         manualTest()
-    if response.startswith('a'):
-        sys.argv.pop()
+    if response == 'a':
+        try:
+            sys.argv[1]
+        except IndexError:
+            pass
+        else:
+            sys.argv.pop()
         unittest.main()
-    qToEe.put('stop')
-    ee.join()
