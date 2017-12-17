@@ -24,3 +24,38 @@ class StateMachine():
         print('exit')
         self.qToEe.put('quit')
         self.ee.join()
+
+    def updateViews(self):
+        self.clearQFromEe()
+        self.updateSv()
+        self.updatePv()
+        self.updateRemainingStepTime()
+        self.updateTotalRemainingTime()
+
+    def clearQFromEe(self):
+        for i in range(self.qFromEe.qsize()):
+            self.qFromEe.get()
+
+    def updateSv(self):
+        self.qToEe.put('getSv')
+        sv = self.qFromEe.get()
+        if not sv == None:
+            self.brewView.setSetValue(sv)
+
+    def updatePv(self):
+        self.qToEe.put('getPv')
+        pv = self.qFromEe.get()
+        if not pv == None:
+            self.brewView.setProcessValue(pv)
+
+    def updateRemainingStepTime(self):
+        self.qToEe.put('getRemainingStepTime')
+        rst = self.qFromEe.get()
+        if not rst == None:
+            self.brewView.setStepTimeLeft(rst)
+
+    def updateTotalRemainingTime(self):
+        self.qToEe.put('getTotalRemainingTime')
+        trt = self.qFromEe.get()
+        if not trt == None:
+            self.brewView.setTotalTimeLeft(trt)

@@ -16,6 +16,8 @@ class TotalRemainingTimeEstimator():
                                  currentTemp,
                                  elapsedStepTime,
                                  isStepTempReached):
+        if not self.recipe:
+            return 0
         timeLeft = 0
         for index, step in enumerate(self.recipe):
             if index < currentStep:
@@ -63,6 +65,13 @@ class TotalRemainingTimeEstimatorTest(unittest.TestCase):
 
     def test_getHeatTime(self):
         self.assertEqual(self.e.getHeatTime(25, 30), 5)
+
+    def test_noRecipe(self):
+        e = TotalRemainingTimeEstimator(None, 1)
+        self.assertEqual(e.estimateRemainingSeconds(currentStep=1,
+                                                    currentTemp=40,
+                                                    elapsedStepTime=1,
+                                                    isStepTempReached=True), 0)
 
 if __name__ == '__main__':
     unittest.main()

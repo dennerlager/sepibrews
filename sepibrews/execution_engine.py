@@ -20,14 +20,19 @@ class ExecutionEngine(Process):
         self.inq = inq
         self.outq = outq
         self.parser = Parser(self)
-        self.isStepTempReached = False
-        self.elapsedStepTime = 0
-        self.currentStep = 0
         try:
             self.tempController = Cn7800(tempControllerAddress)
         except SerialException:
             print('interface not found, using mock')
             self.tempController = Cn7800Mock(tempControllerAddress)
+        self.isStopReceived = False
+        self.resetRecipe()
+
+    def resetRecipe(self):
+        self.recipe = None
+        self.isStepTempReached = False
+        self.elapsedStepTime = 0
+        self.currentStep = 0
 
     def setRecipe(self, recipe):
         self.recipe = RecipeBuilder().parse(recipe)
@@ -48,6 +53,7 @@ class ExecutionEngine(Process):
         self.outq.put(command.execute())
 
     def execute(self):
+        self.isStopReceived = False
         self.tempController.start()
         for stepindex, step in enumerate(self.recipe):
             self.currentStep = stepindex
@@ -60,6 +66,8 @@ class ExecutionEngine(Process):
     def stopExecution(self):
         self.tempController.setTemperature(0)
         self.tempController.stop()
+        self.isStopReceived = True
+        self.resetRecipe()
 
     def waitTillTempReached(self, temperatureC):
         print('changing temperature to {:.1f}C'.format(temperatureC))
@@ -69,6 +77,8 @@ class ExecutionEngine(Process):
             i = 0
             while not abs(self.tempController.getTemperature() - temperatureC) < 0.1:
                 self.handleCommunication()
+                if self.isStopReceived:
+                    break
                 bar.update(i)
                 i += 1
 
@@ -82,6 +92,8 @@ class ExecutionEngine(Process):
             while time.time() < stopTime:
                 self.elapsedStepTime = time.time() - startTime
                 self.handleCommunication()
+                if self.isStopReceived:
+                    break
                 bar.update(min((time.time() - startTime, durationSec)))
 
     def getSetValue(self):
@@ -100,7 +112,11 @@ class ExecutionEngine(Process):
                                           self.isStepTempReached))
 
     def getRemainingStepTime(self):
-        return self.recipe.steps[self.currentStep].durationSec - self.elapsedStepTime
+        try:
+            return (self.recipe.steps[self.currentStep].durationSec -
+                    self.elapsedStepTime)
+        except AttributeError:
+            return 0
 
 if __name__ == '__main__':
     qToEe = Queue()

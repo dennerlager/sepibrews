@@ -2,7 +2,7 @@
 from __future__ import print_function, division
 import os
 import Tkinter as tk
-from statemachine import StateMachine
+from no_fuss_statemachine import StateMachine
 
 class Sepis(tk.Frame):
     def __init__(self, parent=None, **options):
