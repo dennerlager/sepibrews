@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function, division
+import logging
+import logging.handlers
 import unittest
 import progressbar
 import time
@@ -17,16 +19,32 @@ sys.path.append('./recipes/')
 class ExecutionEngine(Process):
     def __init__(self, tempControllerAddress, inq, outq):
         Process.__init__(self)
+        self.tempControllerAddress = tempControllerAddress
         self.inq = inq
         self.outq = outq
         self.parser = Parser(self)
         try:
-            self.tempController = Cn7800(tempControllerAddress)
+            self.tempController = Cn7800(self.tempControllerAddress)
         except SerialException:
             print('interface not found, using mock')
-            self.tempController = Cn7800Mock(tempControllerAddress)
+            self.tempController = Cn7800Mock(self.tempControllerAddress)
         self.isStopReceived = False
         self.resetRecipe()
+        self.setupLogger()
+
+    def setupLogger(self):
+        self.logger = logging.getLogger('{}_{}'.format(
+            __name__, self.tempControllerAddress))
+        self.logger.setLevel(logging.INFO)
+        fh = logging.handlers.RotatingFileHandler(
+            'ee_{}.log'.format(self.tempControllerAddress),
+            maxBytes=20000,
+            backupCount=5)
+        fh.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(process)d - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        self.logger.addHandler(fh)
 
     def resetRecipe(self):
         self.recipe = None
@@ -35,12 +53,15 @@ class ExecutionEngine(Process):
         self.currentStep = 0
 
     def setRecipe(self, recipe):
+        self.logger.info('set recipe: {}'.format(recipe))
         self.recipe = RecipeBuilder().parse(recipe)
 
     def __del__(self):
+        self.logger.info('destructor')
         self.tempController.stop()
 
     def run(self):
+        self.logger.info('process started')
         while True:
             self.handleCommunication()
 
@@ -49,10 +70,12 @@ class ExecutionEngine(Process):
             commandstring = self.inq.get(block=True, timeout=0.5)
         except Empty:
             return
+        self.logger.debug('command received: {}'.format(commandstring))
         command = self.parser.parse(commandstring)
         self.outq.put(command.execute())
 
     def execute(self):
+        self.logger.info('recipe started')
         self.isStopReceived = False
         self.tempController.start()
         for stepindex, step in enumerate(self.recipe):
@@ -64,6 +87,7 @@ class ExecutionEngine(Process):
         self.stopExecution()
 
     def stopExecution(self):
+        self.logger.info('recipe stopped')
         self.tempController.setTemperature(0)
         self.tempController.stop()
         self.isStopReceived = True
@@ -71,6 +95,7 @@ class ExecutionEngine(Process):
 
     def waitTillTempReached(self, temperatureC):
         print('changing temperature to {:.1f}C'.format(temperatureC))
+        self.logger.info('set temperature to {}'.format(temperatureC))
         self.tempController.setTemperature(temperatureC)
         with progressbar.ProgressBar(
                 max_value=progressbar.UnknownLength) as bar:
@@ -81,6 +106,7 @@ class ExecutionEngine(Process):
                     break
                 bar.update(i)
                 i += 1
+        self.logger.info('temperature reached')
 
     def holdTemperatureFor(self, durationSec):
         print('hold temperature for {}seconds'.format(durationSec))
