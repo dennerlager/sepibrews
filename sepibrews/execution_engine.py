@@ -22,15 +22,15 @@ class ExecutionEngine(Process):
         self.tempControllerAddress = tempControllerAddress
         self.inq = inq
         self.outq = outq
+        self.setupLogger()
         self.parser = Parser(self)
         try:
             self.tempController = Cn7800(self.tempControllerAddress)
         except SerialException:
-            print('interface not found, using mock')
+            self.logger.info('interface not found, using mock')
             self.tempController = Cn7800Mock(self.tempControllerAddress)
         self.isStopReceived = False
         self.resetRecipe()
-        self.setupLogger()
 
     def setupLogger(self):
         self.logger = logging.getLogger('{}_{}'.format(

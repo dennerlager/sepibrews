@@ -77,6 +77,7 @@ class RecipeScrolledList(tk.Frame):
                                      selectmode=tk.SINGLE,
                                      yscrollcommand=scrollbar.set,
                                      height=3,
+                                     width = 10,
                                      exportselection=False)
         scrollbar.config(command=self.recipeList.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -146,19 +147,19 @@ class TotalTimeLeftLabel(tk.Label):
     def __init__(self, parent=None, **options):
         tk.Label.__init__(self, parent)
         self.pack(**options)
-        self.config(text='total time left xxmin')
+        self.config(text='Total xxmin')
 
     def setTotalTimeLeft(self, ttl):
-        self.config(text='total time left {:.1f}min'.format(ttl/60))
+        self.config(text='Total {:.1f}min'.format(ttl/60))
 
 class StepTimeLeftLabel(tk.Label):
     def __init__(self, parent=None, **options):
         tk.Label.__init__(self, parent)
         self.pack(**options)
-        self.config(text='step time left xxmin')
+        self.config(text='Schritt xxmin')
 
     def setStepTimeLeft(self, stl):
-        self.config(text='step time left {:.1f}min'.format(stl/60))
+        self.config(text='Schritt {:.1f}min'.format(stl/60))
 
 class TempFrame(tk.Frame):
     def __init__(self, parent=None, **options):
@@ -204,8 +205,10 @@ class ExitButton(tk.Button):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    # root.attributes('-fullscreen', True)
+    root.attributes('-fullscreen', True)
     root.option_add('*Font', 'DejaVuSans 20')
     myapp = Sepis(root)
+    # root.wm_maxsize(800, 480)
+    # root.wm_minsize(800, 480)
     root.mainloop()
     root.destroy()
