@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import time
 
 class Cn7800Mock():
-    def __init__(self, slaveAddress):
+    def __init__(self, slaveAddress, interfaceLock):
         self.temperatureChangeRateCperSec = 1
         self.processValue = 25
         self.setValue = 25

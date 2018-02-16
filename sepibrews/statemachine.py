@@ -6,14 +6,15 @@ from multiprocessing import Queue
 from execution_engine import ExecutionEngine
 
 class StateMachine():
-    def __init__(self, brewView, tempControllerAddress):
+    def __init__(self, brewView, tempControllerAddress, interfaceLock):
         self.brewView = brewView
         self.tempControllerAddress = tempControllerAddress
         self.qToEe = Queue()
         self.qFromEe = Queue()
         self.ee = ExecutionEngine(self.tempControllerAddress,
                                   self.qToEe,
-                                  self.qFromEe)
+                                  self.qFromEe,
+                                  interfaceLock)
         self.ee.start()
         self.setupLogger()
 

@@ -3,6 +3,7 @@ from __future__ import print_function, division
 import os
 import Tkinter as tk
 from statemachine import StateMachine
+from multiprocessing import Lock
 
 class Sepis(tk.Frame):
     def __init__(self, parent=None, **options):
@@ -12,14 +13,18 @@ class Sepis(tk.Frame):
         self.master.bind('<Escape>', lambda e: self.quit())
 
     def makeWidgets(self):
-        self.brew1 = Brew(self, tempControllerAddress=1, padx=10, pady=5, ipadx=5, ipady=5)
-        self.brew2 = Brew(self, tempControllerAddress=2, padx=10, pady=5, ipadx=5, ipady=5)
+        interfaceLock = Lock()
+        self.brew1 = Brew(self, tempControllerAddress=1, interfaceLock=interfaceLock,
+                          padx=10, pady=5, ipadx=5, ipady=5)
+        self.brew2 = Brew(self, tempControllerAddress=1, interfaceLock=interfaceLock,
+                          padx=10, pady=5, ipadx=5, ipady=5)
         self.exitButton = ExitButton(self)
 
 class Brew(tk.Frame):
-    def __init__(self, parent=None, tempControllerAddress=None, **options):
+    def __init__(self, parent=None, tempControllerAddress=None,
+                 interfaceLock=None, **options):
         tk.Frame.__init__(self, parent)
-        self.sm = StateMachine(self, tempControllerAddress)
+        self.sm = StateMachine(self, tempControllerAddress, interfaceLock)
         self.pack(**options)
         self.makeWidgets()
         self.updateViews()
@@ -205,10 +210,10 @@ class ExitButton(tk.Button):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    root.attributes('-fullscreen', True)
+    # root.attributes('-fullscreen', True)
     root.option_add('*Font', 'DejaVuSans 20')
     myapp = Sepis(root)
-    # root.wm_maxsize(800, 480)
-    # root.wm_minsize(800, 480)
+    root.wm_maxsize(800, 480)
+    root.wm_minsize(800, 480)
     root.mainloop()
     root.destroy()

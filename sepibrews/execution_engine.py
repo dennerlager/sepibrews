@@ -17,7 +17,7 @@ from totalRemainingTimeEstimator import TotalRemainingTimeEstimator
 sys.path.append('./recipes/')
 
 class ExecutionEngine(Process):
-    def __init__(self, tempControllerAddress, inq, outq):
+    def __init__(self, tempControllerAddress, inq, outq, interfaceLock):
         Process.__init__(self)
         self.tempControllerAddress = tempControllerAddress
         self.inq = inq
@@ -25,10 +25,10 @@ class ExecutionEngine(Process):
         self.setupLogger()
         self.parser = Parser(self)
         try:
-            self.tempController = Cn7800(self.tempControllerAddress)
+            self.tempController = Cn7800(self.tempControllerAddress, interfaceLock)
         except SerialException:
             self.logger.info('interface not found, using mock')
-            self.tempController = Cn7800Mock(self.tempControllerAddress)
+            self.tempController = Cn7800Mock(self.tempControllerAddress, interfaceLock)
         self.isStopReceived = False
         self.resetRecipe()
 

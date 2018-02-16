@@ -5,9 +5,9 @@ from memory import Memory
 from interface import Interface
 
 class Cn7800():
-    def __init__(self, slaveAddress):
+    def __init__(self, slaveAddress, interfaceLock):
         self.memory = Memory()
-        self.sif = Interface(slaveAddress)
+        self.sif = Interface(slaveAddress, interfaceLock)
         self.temperatureChangeRateCperSec = 1/60
 
     def readRegister(self, name):
