@@ -9,7 +9,7 @@ from step import Step
 class RecipeBuilder():
     def parse(self, filename):
         recipe = Recipe()
-        with open (filename, 'rb') as filehandle:
+        with open (filename, 'r') as filehandle:
             self.throwAwayHeaderLine(filehandle)
             reader = csv.reader(filehandle, dialect=dsv.DsvDialect)
             for line in reader:

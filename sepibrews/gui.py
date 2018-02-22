@@ -16,9 +16,11 @@ class Sepis(tk.Frame):
         interfaceLock = Lock()
         self.brew1 = Brew(self, tempControllerAddress=1, interfaceLock=interfaceLock,
                           padx=10, pady=5, ipadx=5, ipady=5)
-        self.brew2 = Brew(self, tempControllerAddress=1, interfaceLock=interfaceLock,
+        self.brew2 = Brew(self, tempControllerAddress=2, interfaceLock=interfaceLock,
                           padx=10, pady=5, ipadx=5, ipady=5)
         self.exitButton = ExitButton(self)
+        self.brew1.updateViews()
+        self.brew2.updateViews()
 
 class Brew(tk.Frame):
     def __init__(self, parent=None, tempControllerAddress=None,
@@ -27,7 +29,6 @@ class Brew(tk.Frame):
         self.sm = StateMachine(self, tempControllerAddress, interfaceLock)
         self.pack(**options)
         self.makeWidgets()
-        self.updateViews()
 
     def destroy(self):
         self.sm.quit()
@@ -49,7 +50,7 @@ class Brew(tk.Frame):
 
     def updateViews(self):
         self.sm.updateViews()
-        self.after(100, self.updateViews)
+        self.after(500, self.updateViews)
 
     def getRecipe(self):
         return self.recipeFrame.getCurrentRecipe()
@@ -72,7 +73,8 @@ class Brew(tk.Frame):
 class RecipeScrolledList(tk.Frame):
     def __init__(self, parent=None, **options):
         tk.Frame.__init__(self, parent)
-        self.recipeDirectory = './recipes'
+        path = os.path.dirname(os.path.realpath(__file__))
+        self.recipeDirectory = path + '/recipes'
         self.pack(**options)
         self.makeWidgets()
 
@@ -210,10 +212,10 @@ class ExitButton(tk.Button):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    # root.attributes('-fullscreen', True)
+    root.attributes('-fullscreen', True)
     root.option_add('*Font', 'DejaVuSans 20')
     myapp = Sepis(root)
-    root.wm_maxsize(800, 480)
-    root.wm_minsize(800, 480)
+    # root.wm_maxsize(800, 480)
+    # root.wm_minsize(800, 480)
     root.mainloop()
     root.destroy()

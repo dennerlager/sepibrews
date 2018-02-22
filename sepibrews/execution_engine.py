@@ -2,7 +2,6 @@
 from __future__ import print_function, division
 import logging
 import logging.handlers
-import unittest
 import progressbar
 import time
 import sys
@@ -139,8 +138,9 @@ class ExecutionEngine(Process):
 
     def getRemainingStepTime(self):
         try:
-            return (self.recipe.steps[self.currentStep].durationSec -
+            time = (self.recipe.steps[self.currentStep].durationSec -
                     self.elapsedStepTime)
+            return time if time > 0 else 0
         except AttributeError:
             return 0
 

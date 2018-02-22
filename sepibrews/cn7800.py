@@ -3,6 +3,7 @@ from __future__ import print_function, division
 import unittest
 from memory import Memory
 from interface import Interface
+from multiprocessing import Lock
 
 class Cn7800():
     def __init__(self, slaveAddress, interfaceLock):
@@ -40,7 +41,7 @@ class Cn7800():
 
 class Cn7800test(unittest.TestCase):
     def setUp(self):
-        self.tc = Cn7800(1)
+        self.tc = Cn7800(1, Lock())
 
     def test_readRegister(self):
         self.assertEqual(self.tc.readRegister('upper_limit'), 6000)
