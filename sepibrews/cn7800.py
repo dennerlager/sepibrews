@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
 import unittest
 from memory import Memory
 from interface import Interface

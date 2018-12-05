@@ -1,10 +1,8 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
-import unittest
 import csv
 import dsv
-from recipe import Recipe
+import unittest
 from step import Step
+from recipe import Recipe
 
 class RecipeBuilder():
     def parse(self, filename):

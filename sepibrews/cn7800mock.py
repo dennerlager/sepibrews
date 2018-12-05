@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
 import time
 
 class Cn7800Mock():
@@ -9,6 +7,8 @@ class Cn7800Mock():
         self.setValue = 25
         self.atTemperature = True
         self.timeTemperatureSet = time.time()
+        self.slaveAddress = slaveAddress
+        self.interfaceLock = interfaceLock
 
     def getTemperature(self):
         if self.atTemperature:

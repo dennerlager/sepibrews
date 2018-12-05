@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
-import unittest
 import command
+import unittest
 
 class Parser():
     def __init__(self, executionEngine):

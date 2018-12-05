@@ -1,17 +1,15 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
+import sys
+import time
 import logging
 import logging.handlers
 import progressbar
-import time
-import sys
-from multiprocessing import Process, Queue
-from serial.serialutil import SerialException
-from Queue import Empty
+from queue import Empty
 from cn7800 import Cn7800
+from parser import Parser
 from cn7800mock import Cn7800Mock
 from recipe_builder import RecipeBuilder
-from parser import Parser
+from multiprocessing import Process, Queue, Lock
+from serial.serialutil import SerialException
 from totalRemainingTimeEstimator import TotalRemainingTimeEstimator
 sys.path.append('./recipes/')
 
@@ -30,6 +28,10 @@ class ExecutionEngine(Process):
             self.tempController = Cn7800Mock(self.tempControllerAddress, interfaceLock)
         self.isStopReceived = False
         self.resetRecipe()
+        self.recipe = None
+        self.isStepTempReached = None
+        self.elapsedStepTime = None
+        self.currentStep = None
 
     def setupLogger(self):
         self.logger = logging.getLogger('{}_{}'.format(
@@ -56,7 +58,6 @@ class ExecutionEngine(Process):
         self.recipe = RecipeBuilder().parse(recipe)
 
     def __del__(self):
-        self.logger.info('destructor')
         self.tempController.stop()
 
     def run(self):
@@ -138,16 +139,15 @@ class ExecutionEngine(Process):
 
     def getRemainingStepTime(self):
         try:
-            time = (self.recipe.steps[self.currentStep].durationSec -
+            rstime = (self.recipe.steps[self.currentStep].durationSec -
                     self.elapsedStepTime)
-            return time if time > 0 else 0
-        except AttributeError:
+            return rstime if rstime > 0 else 0
+        except (AttributeError, TypeError):
             return 0
 
 if __name__ == '__main__':
     qToEe = Queue()
     qFromEe = Queue()
-    from cn7800mock import Cn7800Mock as Cn7800
-    ee = ExecutionEngine(1, qToEe, qFromEe)
+    ee = ExecutionEngine(1, qToEe, qFromEe, Lock())
     ee.setRecipe('./recipes/test.csv')
     ee.execute()

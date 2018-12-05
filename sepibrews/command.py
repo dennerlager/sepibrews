@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
-import unittest
 import sys
+import unittest
 
 class Command():
     """Use factory method 'create(command_name)' to instantiate"""

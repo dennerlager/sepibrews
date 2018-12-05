@@ -1,12 +1,11 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
-import unittest
-import time
+#!/usr/bin/env python3
 import sys
-from multiprocessing import Queue
-from execution_engine import ExecutionEngine
-from Queue import Empty
+import time
+import unittest
+from queue import Empty
 from command import commands
+from multiprocessing import Queue, Lock
+from execution_engine import ExecutionEngine
 
 def printAvailableCommands():
     print('possible commands:')
@@ -17,12 +16,12 @@ def printAvailableCommands():
 def manualTest():
     qToEe = Queue()
     qFromEe = Queue()
-    ee = ExecutionEngine(1, qToEe, qFromEe)
+    ee = ExecutionEngine(1, qToEe, qFromEe, Lock())
     ee.setRecipe('./recipes/test.csv')
     ee.start()
     printAvailableCommands()
     while True:
-        command = raw_input('command: ')
+        command = input('command: ')
         if command == 'q':
             break
         if not command in commands.keys():
@@ -39,7 +38,7 @@ class AutomaticTest(unittest.TestCase):
     def setUp(self):
         self.qToEe = Queue()
         self.qFromEe = Queue()
-        self.ee = ExecutionEngine(1, self.qToEe, self.qFromEe)
+        self.ee = ExecutionEngine(1, self.qToEe, self.qFromEe, Lock())
         self.ee.start()
         self.transceive('{} {}'.format('setRecipe', './recipes/test.csv'))
 
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     while True:
         if response == 'a' or response == 'm':
             break
-        response = raw_input('automatic (a) or manual (m) test?: ')
+        response = input('automatic (a) or manual (m) test?: ')
 
     if response == 'm':
         manualTest()

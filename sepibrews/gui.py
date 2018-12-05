@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-from __future__ import print_function, division
+#!/usr/bin/env python3
 import os
-import Tkinter as tk
-from statemachine import StateMachine
+import tkinter as tk
 from multiprocessing import Lock
+from statemachine import StateMachine
 
 class Sepis(tk.Frame):
     def __init__(self, parent=None, **options):
@@ -26,6 +25,7 @@ class Brew(tk.Frame):
     def __init__(self, parent=None, tempControllerAddress=None,
                  interfaceLock=None, **options):
         tk.Frame.__init__(self, parent)
+        self.tempControllerAddress = tempControllerAddress
         self.sm = StateMachine(self, tempControllerAddress, interfaceLock)
         self.pack(**options)
         self.makeWidgets()
@@ -35,6 +35,11 @@ class Brew(tk.Frame):
         tk.Frame.destroy(self)
 
     def makeWidgets(self):
+        self.brewLabel = BrewLabel(self, brewLabelText=self.tempControllerAddress,
+                                   side=tk.TOP,
+                                   padx=10, pady=0,
+                                   ipadx=5, ipady=5,
+                                   anchor='w')
         self.recipeFrame = RecipeScrolledList(self, side=tk.LEFT,
                                               padx=10, pady=5,
                                               ipadx=5, ipady=5)
@@ -70,6 +75,12 @@ class Brew(tk.Frame):
     def setTotalTimeLeft(self, ttl):
         self.timeFrame.setTotalTimeLeft(ttl)
 
+class BrewLabel(tk.Label):
+    def __init__(self, parent=None, brewLabelText=None, **options):
+        tk.Label.__init__(self, parent)
+        self.pack(**options)
+        self.config(text='Sud {}'.format(brewLabelText))
+
 class RecipeScrolledList(tk.Frame):
     def __init__(self, parent=None, **options):
         tk.Frame.__init__(self, parent)
@@ -84,7 +95,7 @@ class RecipeScrolledList(tk.Frame):
                                      selectmode=tk.SINGLE,
                                      yscrollcommand=scrollbar.set,
                                      height=3,
-                                     width = 10,
+                                     width = 14,
                                      exportselection=False)
         scrollbar.config(command=self.recipeList.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
