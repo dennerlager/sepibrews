@@ -97,6 +97,8 @@ class ExecutionEngine(Process):
         print('changing temperature to {:.1f}C'.format(temperatureC))
         self.logger.info('set temperature to {}'.format(temperatureC))
         self.tempController.setTemperature(temperatureC)
+        if temperatureC == -1:
+            return
         with progressbar.ProgressBar(
                 max_value=progressbar.UnknownLength) as bar:
             i = 0

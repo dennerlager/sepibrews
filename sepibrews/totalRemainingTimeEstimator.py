@@ -30,6 +30,8 @@ class TotalRemainingTimeEstimator():
         return timeLeft
 
     def getHeatTime(self, fromTempC, toTempC):
+        if toTempC == -1:
+            return 0
         deltaT = toTempC - fromTempC
         return deltaT / self.temperatureChangeRateCperSec
 

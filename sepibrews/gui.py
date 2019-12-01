@@ -174,10 +174,10 @@ class StepTimeLeftLabel(tk.Label):
     def __init__(self, parent=None, **options):
         tk.Label.__init__(self, parent)
         self.pack(**options)
-        self.config(text='Schritt xxmin')
+        self.config(text='Rast xxmin')
 
     def setStepTimeLeft(self, stl):
-        self.config(text='Schritt {:.1f}min'.format(stl/60))
+        self.config(text='Rast {:.1f}min'.format(stl/60))
 
 class TempFrame(tk.Frame):
     def __init__(self, parent=None, **options):
