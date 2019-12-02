@@ -97,12 +97,12 @@ class ExecutionEngine(Process):
         print('changing temperature to {:.1f}C'.format(temperatureC))
         self.logger.info('set temperature to {}'.format(temperatureC))
         self.tempController.setTemperature(temperatureC)
-        if temperatureC == -1:
+        if temperatureC == 0:
             return
         with progressbar.ProgressBar(
                 max_value=progressbar.UnknownLength) as bar:
             i = 0
-            while not abs(self.tempController.getTemperature() - temperatureC) < 0.1:
+            while not abs(self.tempController.getTemperature() - temperatureC) < 0.5:
                 self.handleCommunication()
                 if self.isStopReceived:
                     break

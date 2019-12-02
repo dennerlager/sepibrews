@@ -25,12 +25,13 @@ class TotalRemainingTimeEstimator():
                 timeLeft += step.durationSec
             else:
                 timeLeft += step.durationSec - elapsedStepTime
-            currentTemp = step.temperatureC
+            if not step.temperatureC == 0:
+                currentTemp = step.temperatureC
             isStepTempReached = False
         return timeLeft
 
     def getHeatTime(self, fromTempC, toTempC):
-        if toTempC == -1:
+        if toTempC == 0:
             return 0
         deltaT = toTempC - fromTempC
         return deltaT / self.temperatureChangeRateCperSec
