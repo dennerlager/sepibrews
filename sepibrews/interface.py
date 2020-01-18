@@ -11,16 +11,36 @@ class Interface():
 
     def readBit(self, address):
         with self.interfaceLock:
-            return self.dev.read_bit(address)
+            for i in range(10):
+                try:
+                    return self.dev.read_bit(address)
+                except Exception as e:
+                    print(i, e)
+        raise RuntimeError('cannot read {}'.format(address))
 
     def writeBit(self, address, data):
         with self.interfaceLock:
-            self.dev.write_bit(address, data)
+            for i in range(10):
+                try:
+                    return self.dev.write_bit(address, data)
+                except Exception as e:
+                    print(i, e)
+        raise RuntimeError('cannot write {} to {}'.format(address, data))
 
     def readRegister(self, address):
         with self.interfaceLock:
-            return self.dev.read_register(address)
+            for i in range(10):
+                try:
+                    return self.dev.read_register(address)
+                except Exception as e:
+                    print(i, e)
+        raise RuntimeError('cannot read {}'.format(address))
 
     def writeRegister(self, address, data):
         with self.interfaceLock:
-            self.dev.write_register(address, data, functioncode=6)
+            for i in range(10):
+                try:
+                    return self.dev.write_register(address, data, functioncode=6)
+                except Exception as e:
+                    print(i, e)
+        raise RuntimeError('cannot write {} to {}'.format(address, data))
