@@ -1,0 +1,25 @@
+- ip = 192.168.1.112, username = pi, password =
+- rs485 interface: usb-rs485-we-1800-bt
+- rpi3, pi foundation 7" display, smarticase
+- set pi passwd
+- set root passwd:
+- enable ssh server: sudo passwd root
+Enter sudo raspi-config in the terminal, first select Interfacing options,
+then navigate to ssh, press Enter and select enable or disable ssh server.
+- set locale there as well
+- sudo apt-get update
+- suod apt-get upgrade
+- install emacs
+- copy .emacs file
+- modify .bashrc with some handy aliases
+- update pip: sudo pip install --upgrade pip
+- sudo apt-get install python-dev python3-dev
+- sudo pip install pymodbus
+- usb/rs485 interface is at /dev/ttyUSB0
+- sudo apt-get install python-numpy python-scipy python-h5py hdfview
+- sudo pip install minimalmodbus
+- sudo pip install modbus_tk
+- sudo pip install progressbar2
+- sudo apt-get install x11vnc
+start x11vnc server on display 0:
+x11vnc -nopw -display :0

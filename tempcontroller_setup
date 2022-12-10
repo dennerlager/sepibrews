@@ -1,0 +1,22 @@
+slave addresses to 1/2
+interface type minimal modbus
+
+press enter 3s
+CnPt: Pt
+tPUn: C
+tP-H: 600
+tP-L: +99.9
+Ctrl: onoF
+S-HC: HEAt
+ALA1: 0
+ALA2: 0
+ALA3: 0
+SALA: oFF
+CoSH: on (allow writing over interface)
+C-SL: ASCII (communication format)
+C-no: 1 or 2 (communication address)
+bPS: 9600 (baudrate)
+LEn: 8 (datalength)
+PrtY: none (parity)
+StoP: 1 (number of stop bits)
+press enter
